@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>LockOdds</title>
+<style>
+:root{--bg:#0f1114;--card:#1a1c22;--card2:#23262e;--line:#2a2d36;--tx:#f2f3f5;--mu:#8d93a0;--blue:#2c64f6;--green:#27ae60;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button,input{font:inherit;color:inherit}button{cursor:pointer;background:none;border:0}
+:focus-visible{outline:2px solid #8ab4ff;outline-offset:2px}
+.top{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.top .in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;gap:16px;align-items:center}
+.logo{font-weight:800;font-size:20px;letter-spacing:.02em}
+.sbox{flex:1;position:relative;max-width:520px}
+.sbox input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 34px 9px 14px}
+.sbox kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mu);border:1px solid var(--line);border-radius:4px;padding:0 6px;font-size:11px}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 12px;font-size:13px}
+.pill:hover{background:var(--card2)}
+.layout{max-width:1180px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px}
+nav button{display:flex;justify-content:space-between;width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-weight:600;color:var(--mu)}
+nav button:hover{color:var(--tx)}
+nav button[aria-current=true]{background:var(--card);color:var(--tx)}
+nav small{font-weight:400}
+h1{font-size:30px;font-weight:800;margin-bottom:6px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;color:#b9bfcb;font-size:14px;margin:10px 0 18px}
+.ctl input[type=range]{accent-color:var(--blue);width:140px;vertical-align:middle}
+select{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 8px;color:var(--tx)}
+.ctl b{color:var(--tx);font-variant-numeric:tabular-nums}
+.day{font-size:15px;font-weight:700;margin:22px 0 10px}
+.ev{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.ev h3{font-size:18px;font-weight:600}
+.when{color:#b9bfcb;font-size:14px;margin-top:4px;display:flex;gap:4px 14px;flex-wrap:wrap}
+.when b{color:var(--tx);font-weight:600}
+.sels{display:flex;gap:8px;flex-wrap:wrap}
+.sel{background:#1f4fd8;border-radius:10px;padding:10px 16px;min-width:170px;text-align:left}
+.sel .n{font-weight:700;font-size:16px;color:#fff}
+.sel .p{font-size:13px;opacity:.9;font-variant-numeric:tabular-nums}
+.sel .d{font-size:24px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.sel{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.empty,.err{padding:40px 0;text-align:center;color:var(--mu)}
+.err{color:#ff8a8a;border:1px solid #4a2326;background:#1c1214;border-radius:12px;padding:16px;text-align:left;margin-bottom:14px;font-size:13px}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:12px;padding:20px;width:min(440px,92vw)}
+dialog::backdrop{background:#000a}
+dialog label{display:block;margin:12px 0 4px;font-size:12px;color:var(--mu)}
+dialog input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+#hidebox input{width:auto}
+#hidebox label{display:inline-flex;gap:6px;align-items:center;margin:4px 14px 4px 0;color:var(--tx);font-size:13px}
+.acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.pri{background:var(--blue);border-color:var(--blue)}
+.note{color:var(--mu);font-size:12px;margin-top:28px}
+@media(max-width:820px){.layout{grid-template-columns:1fr}nav{display:flex;gap:6px;overflow-x:auto}nav button{width:auto;white-space:nowrap;gap:8px}}
+
+dialog select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+dialog pre{margin-top:8px;font-size:12px;color:#b9bfcb;white-space:pre-wrap;max-height:160px;overflow:auto}
+.status{color:#b9bfcb;font-size:14px}
+@media(max-width:820px){
+.top .in{padding:10px 14px;gap:10px}.sbox{min-width:0}.logo{font-size:18px}
+.layout{padding:12px 14px;gap:8px}
+nav{position:sticky;top:57px;z-index:4;background:var(--bg);padding:8px 0}
+nav button{padding:9px 14px;border:1px solid var(--line);border-radius:999px}
+h1{font-size:24px}
+.ev{padding:14px}.ev>div:first-child{width:100%}
+.sels{width:100%}.sel{flex:1;min-width:0}
+.pill{padding:9px 14px}
+}</style>
+</head>
+<body>
+<div class="top"><div class="in">
+ <span class="logo">LockOdds</span>
+ <div class="sbox"><input id="q" type="search" placeholder="Search teams or events" aria-label="Search"><kbd>/</kbd></div>
+ <button class="pill" id="refresh">Refresh</button>
+ <button class="pill" id="cfg" aria-label="Settings">Settings</button>
+</div></div>
+<div class="layout">
+ <nav id="nav" aria-label="Categories"></nav>
+ <main>
+  <h1 id="h">All Sports</h1>
+  <div class="ctl">
+   <label>Odds ceiling <input id="cap" type="range" min="1.01" max="1.15" step="0.01" value="1.15"> <b id="capv">1.15</b></label>
+   <span class="status" id="stat"></span>
+  </div>
+  <div id="err"></div>
+  <div id="list"></div>
+  <p class="note">Odds are converted from Polymarket’s public prices (1 divided by the share price). Sports are pre-match only; politics and finance show their resolution date. Rough conversion, not a bookmaker quote.</p>
+ </main>
+</div>
+<dialog id="dlg">
+ <h2 style="font-size:16px">Settings</h2>
+ <label for="base">API base URL (empty for direct, or your Worker proxy)</label>
+ <input id="base" type="url" placeholder="https://gamma-api.polymarket.com">
+ <label for="days">Look ahead</label>
+ <select id="days"><option value="3">3 days</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select>
+ <label>Hide categories</label><div id="hidebox"></div>
+ <button class="pill" id="diag" style="margin-top:14px">Diagnose market types (next 2 days)</button>
+ <pre id="diagout"></pre>
+ <label>Last load details</label><pre id="detail"></pre>
+ <div class="acts"><button class="pill" id="x">Cancel</button><button class="pill pri" id="ok">Save</button></div>
+</dialog>
+<script>
+// <pure>
+const J=v=>{try{return typeof v==="string"?JSON.parse(v):(v||[])}catch{return[]}};
+function parseT(s){if(!s)return NaN;s=String(s).trim().replace(" ","T").replace(/([+-]\d\d)$/,"$1:00");return Date.parse(s)}
+const clean=t=>String(t||"").replace(/^[^\p{L}\p{N}$]+/u,"").trim();
+function sportOf(ev,m){
+ const t=[...(m.tags||[]),...(ev.tags||[])].map(x=>x.slug||x.label||"").join(" ").toLowerCase()+" "+String(ev.slug||"").toLowerCase()+" "+String(ev.title||"").toLowerCase();
+ if(/\bnfl\b|college-football|ncaaf|cfb/.test(t))return"American Football";
+ if(/\bnba\b|basketball|euroleague|ncaab|cbb|wnba/.test(t))return"Basketball";
+ if(/soccer|\bepl\b|\bucl\b|\buel\b|champions-league|la-liga|bundesliga|serie-a|ligue|\bmls\b|premier-league|world-cup|uefa|fifa|\bfl1\b|\bsea\b/.test(t))return"Soccer";
+ if(/tennis|\batp\b|\bwta\b/.test(t))return"Tennis";
+ if(/cricket|\bipl\b|t20|\bodi\b|\bbbl\b/.test(t))return"Cricket";
+ if(/\bnhl\b|hockey/.test(t))return"Hockey";
+ if(/\bmlb\b|baseball/.test(t))return"Baseball";
+ if(/\bufc\b|\bmma\b|boxing/.test(t))return"Combat";
+ if(/rugby|aussie|\bafl\b/.test(t))return"Rugby and AFL";
+ return"Other";
+}
+// Moneyline markets (server-filtered) grouped into one card per event; keep only selections priced >= minP.
+function parseMarkets(markets,now,minP,hide=[]){
+ const st={markets:markets.length,started:0,noTime:0,sels:0};const by=new Map();
+ for(const m of markets){
+  if(m.closed||m.active===false)continue;
+  const ev=(m.events&&m.events[0])||{};
+  const type=String(m.sportsMarketType||"").toLowerCase();
+  if(type&&type!=="moneyline")continue;
+  if(hide.includes(sportOf(ev,m)))continue;
+  if(ev.live||ev.ended){st.started++;continue}
+  const t=parseT(m.eventStartTime||m.gameStartTime||ev.startTime);
+  if(!Number.isFinite(t)){st.noTime++;continue}
+  if(t<=now){st.started++;continue}
+  const key=ev.id||m.id;let c=by.get(key);
+  if(!c){c={id:key,title:clean(ev.title||m.question)||"Event",start:t,sport:sportOf(ev,m),sels:[]};by.set(key,c)}
+  const names=J(m.outcomes),px=J(m.outcomePrices).map(Number);
+  const add=(n,p)=>{if(/^draw$/i.test(n)||!(p>0&&p<=0.99))return;st.sels++;if(p>=minP)c.sels.push({name:n,price:p,dec:1/p})};
+  if(names.length===2&&!/^(yes|no)$/i.test(names[0]))names.forEach((n,i)=>add(n,px[i]));
+  else{const ask=Number(m.bestAsk);add(clean(m.groupItemTitle)||clean(m.question)||"Yes",ask>0?ask:px[0])}
+ }
+ st.bySport={};for(const c of by.values())st.bySport[c.sport]=(st.bySport[c.sport]||0)+1;
+ const cards=[...by.values()].filter(c=>c.sels.length);
+ cards.forEach(c=>c.sels.sort((a,b)=>b.price-a.price));
+ return{cards:cards.sort((a,b)=>a.start-b.start),st};
+}
+// Non-sport events (politics, finance, crypto...): resolution date stands in for the start time.
+function parseGeneral(events,now,minP,days){
+ const cards=[],end=now+days*864e5,ok=p=>p>=minP&&p<=0.99;
+ for(const ev of events||[]){
+  const mk=(ev.markets||[]).filter(m=>!m.closed&&m.active!==false),multi=mk.length>2;
+  for(const m of mk){
+   if(m.sportsMarketType)continue;
+   const t=parseT(m.endDate||ev.endDate);
+   if(!Number.isFinite(t)||t<=now||t>end)continue;
+   const liq=Number(m.liquidityNum??m.liquidity);if(Number.isFinite(liq)&&liq<1000)continue;
+   const names=J(m.outcomes),px=J(m.outcomePrices).map(Number),sels=[];
+   if(names.length===2&&/^yes$/i.test(names[0])){
+    const ask=Number(m.bestAsk),bid=Number(m.bestBid),yes=ask>0?ask:px[0],no=bid>0?1-bid:px[1];
+    if(ok(yes))sels.push({name:"Yes",price:yes,dec:1/yes});
+    if(!multi&&ok(no))sels.push({name:"No",price:no,dec:1/no});
+   }else if(names.length===2)names.forEach((n,i)=>{if(ok(px[i]))sels.push({name:n,price:px[i],dec:1/px[i]})});
+   if(sels.length)cards.push({id:ev.id+":"+m.id,kind:"event",title:clean(multi&&/\p{L}/u.test(m.groupItemTitle||"")?ev.title+": "+m.groupItemTitle:(m.question||ev.title)),start:t,sport:ev._cat||"Other",sels});
+  }
+ }
+ return cards.sort((a,b)=>a.start-b.start);
+}
+// </pure>
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+const LS={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const cfg=Object.assign({base:"",days:7,hide:[]},LS.get("lo.cfg"));
+const SPORTS=["Soccer","American Football","Basketball","Tennis","Hockey","Baseball","Cricket","Combat","Rugby and AFL","Other","Politics","Finance","Crypto","Geopolitics","Tech","Culture"];
+const S={all:[],st:null,sport:"All",q:"",cap:1.15,err:"",err2:"",at:0,capped:false,busy:false};
+const cache=LS.get("lo.cache");if(cache&&Array.isArray(cache.all)){S.all=cache.all;S.at=cache.at||0;S.st=cache.st||null}
+const DAY=864e5,iso=t=>new Date(t).toISOString().replace(/\.\d+Z$/,"Z"),baseUrl=()=>(cfg.base||"https://gamma-api.polymarket.com").replace(/\/$/,"");
+async function tfetch(u){const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);try{return await fetch(u,{signal:c.signal})}finally{clearTimeout(t)}}
+async function load(){
+ if(S.busy)return;S.busy=true;$("refresh").textContent="Loading";S.err="";S.err2="";S.capped=false;
+ try{
+  const base=baseUrl(),now=Date.now(),days=cfg.days||7,STEP=DAY/4,chunks=[];
+  for(let a=now-DAY/2;a<now+(days+1)*DAY;a+=STEP)chunks.push([a,a+STEP]);
+  const one=async(a,b)=>{let out=[],cur="";
+   for(let p=0;p<10;p++){
+    const q=new URLSearchParams({closed:"false",limit:"100",sports_market_types:"moneyline",include_tag:"true",end_date_min:iso(a),end_date_max:iso(b)});
+    if(cur)q.set("after_cursor",cur);
+    const r=await tfetch(base+"/markets/keyset?"+q);
+    if(!r.ok)throw new Error("HTTP "+r.status+" "+(await r.text()).slice(0,140));
+    const d=await r.json();if(!d||!Array.isArray(d.markets))throw new Error("unexpected response");
+    out=out.concat(d.markets);cur=d.next_cursor;if(!cur)break;if(p===9)S.capped=true;
+   }return out};
+  const sportsP=(async()=>{const got=[];let i=0;await Promise.all(Array.from({length:6},async()=>{while(i<chunks.length){const c=chunks[i++];got.push(...await one(c[0],c[1]))}}));const m=new Map();got.forEach(x=>m.set(x.id,x));return[...m.values()]})();
+  const TAGS=[["politics","Politics"],["elections","Politics"],["finance","Finance"],["economy","Finance"],["crypto","Crypto"],["geopolitics","Geopolitics"],["tech","Tech"],["culture","Culture"]];
+  const genP=(async()=>{try{const evs=new Map();
+   await Promise.all(TAGS.flatMap(([tag,cat])=>[0,100,200].map(async off=>{
+    const r=await tfetch(base+"/events?tag_slug="+tag+"&closed=false&active=true&limit=100&offset="+off+"&end_date_min="+iso(now)+"&end_date_max="+iso(now+(days+1)*DAY));
+    if(!r.ok)throw new Error(tag+" HTTP "+r.status);
+    const d=await r.json();if(!Array.isArray(d))return;
+    d.forEach(e=>{if(!evs.has(e.id))evs.set(e.id,{...e,_cat:cat})});
+   })));return[...evs.values()]}catch(e){S.err2="Politics and finance failed to load ("+e.message+").";return[]}})();
+  const [markets,gen]=await Promise.all([sportsP,genP]);
+  const sp=parseMarkets(markets,Date.now(),1/1.15,[]);
+  S.all=[...sp.cards,...parseGeneral(gen,Date.now(),1/1.15,days)];S.st=sp.st;S.at=Date.now();
+  LS.set("lo.cache",{all:S.all,at:S.at,st:S.st});
+ }catch(e){S.err="Could not load Polymarket data ("+(e.name==="AbortError"?"timed out":e.message)+"). Showing the last saved list if there is one."}
+ finally{S.busy=false;$("refresh").textContent="Refresh";render()}
+}
+function render(){
+ const now=Date.now(),q=S.q.trim().toLowerCase();
+ const base=S.all.filter(c=>c.start>now&&!cfg.hide.includes(c.sport)).map(c=>({...c,sels:c.sels.filter(s=>s.dec<=S.cap+1e-9)})).filter(c=>c.sels.length);
+ const inq=c=>!q||c.title.toLowerCase().includes(q)||c.sels.some(s=>s.name.toLowerCase().includes(q));
+ $("capv").textContent=S.cap.toFixed(2);
+ $("stat").textContent=S.at?"Updated "+new Date(S.at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+", "+base.length+" events":"";
+ const e=$("err");e.textContent="";if(S.err)e.append(el("div","err",S.err));if(S.err2)e.append(el("div","err",S.err2));
+ const cats=["All",...[...new Set(base.map(c=>c.sport))].sort()];if(!cats.includes(S.sport))S.sport="All";
+ const nav=document.createDocumentFragment();
+ for(const s of cats){const b=el("button","",s);b.append(el("small","",base.filter(c=>(s==="All"||c.sport===s)&&inq(c)).length));b.setAttribute("aria-current",String(S.sport===s));b.onclick=()=>{S.sport=s;render()};nav.append(b)}
+ $("nav").replaceChildren(nav);
+ $("h").textContent=S.sport==="All"?"All Events":S.sport;
+ const vis=base.filter(c=>(S.sport==="All"||c.sport===S.sport)&&inq(c)).sort((a,b)=>a.start-b.start),f=document.createDocumentFragment();
+ if(!vis.length)f.append(el("div","empty",S.at?"Nothing at or under "+S.cap.toFixed(2)+" right now.":"Loading"));
+ let day="";
+ for(const c of vis){
+  const d=new Date(c.start),dk=d.toLocaleDateString([],{weekday:"long",day:"numeric",month:"short"});
+  if(dk!==day){day=dk;f.append(el("div","day",new Date().toDateString()===d.toDateString()?"Today, "+dk:dk))}
+  const mins=Math.round((c.start-now)/6e4),eta=mins<60?mins+"m":mins<2880?Math.floor(mins/60)+"h "+(mins%60)+"m":Math.round(mins/1440)+" days";
+  const card=el("article","ev"),l=el("div"),w=el("div","when");
+  w.append(el("b","",d.toLocaleString([],{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZoneName:"short"})),el("span","",(c.kind==="event"?"resolves in ":"starts in ")+eta),el("span","",c.sport));
+  l.append(el("h3","",c.title),w);
+  const ss=el("div","sels");
+  for(const s of c.sels){const b=el("div","sel");b.append(el("div","n",s.name),el("div","d",s.dec.toFixed(2)));ss.append(b)}
+  card.append(l,ss);f.append(card);
+ }
+ $("list").replaceChildren(f);
+}
+$("q").oninput=e=>{S.q=e.target.value;render()};
+$("cap").oninput=e=>{S.cap=Number(e.target.value);render()};
+$("refresh").onclick=load;
+$("cfg").onclick=()=>{
+ $("base").value=cfg.base||"";$("days").value=String(cfg.days||7);
+ const hb=$("hidebox");hb.textContent="";SPORTS.forEach(n=>{const l=document.createElement("label"),i=document.createElement("input");i.type="checkbox";i.value=n;i.checked=cfg.hide.includes(n);l.append(i,n);hb.append(l)});
+ const st=S.st;$("detail").textContent=st?st.markets+" sports markets read, "+st.started+" already started, "+st.noTime+" without a start time"+(S.capped?", some slices hit the page cap":"")+"\nEvents found per sport: "+(Object.entries(st.bySport||{}).map(e=>e[0]+" "+e[1]).join(", ")||"none"):"No load yet.";
+ $("dlg").showModal();
+};
+$("diag").onclick=async()=>{
+ const o=$("diagout");o.textContent="Checking...";
+ try{
+  const now=Date.now();let all=[],cur="";
+  for(let p=0;p<15;p++){
+   const q=new URLSearchParams({closed:"false",limit:"100",include_tag:"true",end_date_min:iso(now),end_date_max:iso(now+2*DAY)});
+   if(cur)q.set("after_cursor",cur);
+   const r=await tfetch(baseUrl()+"/markets/keyset?"+q);if(!r.ok)throw new Error("HTTP "+r.status);
+   const d=await r.json();all=all.concat(d.markets||[]);cur=d.next_cursor;if(!cur)break;
+  }
+  const t={};all.forEach(m=>{const ev=(m.events&&m.events[0])||{},k=sportOf(ev,m)+" / "+(m.sportsMarketType||"none");t[k]=(t[k]||0)+1});
+  o.textContent=all.length+" markets\n"+Object.entries(t).sort().map(e=>e[0]+": "+e[1]).join("\n");
+ }catch(e){o.textContent="Failed: "+e.message}
+};
+$("x").onclick=()=>$("dlg").close();
+$("ok").onclick=()=>{
+ cfg.base=$("base").value.trim();cfg.days=Number($("days").value)||7;
+ cfg.hide=[...document.querySelectorAll("#hidebox input:checked")].map(i=>i.value);
+ LS.set("lo.cfg",cfg);$("dlg").close();load();
+};
+addEventListener("keydown",e=>{if(e.key==="/"&&document.activeElement.tagName!=="INPUT"){e.preventDefault();$("q").focus()}});
+const stale=()=>Date.now()-S.at>6e5;
+setInterval(()=>{if(document.hidden)return;if(stale())load();else render()},60000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&stale())load()});
+if("serviceWorker"in navigator&&location.protocol.indexOf("http")===0)navigator.serviceWorker.register("sw.js").catch(()=>{});
+render();load();
+</script>
+</body>
+</html>
