@@ -60,6 +60,7 @@ dialog input{width:100%;background:var(--bg);border:1px solid var(--line);border
 
 dialog select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 dialog pre{margin-top:8px;font-size:12px;color:#b9bfcb;white-space:pre-wrap;max-height:160px;overflow:auto}
+.upd{color:#b9bfcb;font-size:14px;margin-bottom:6px}.upd b{color:#fff;font-weight:600}.upd.old b{color:#e0a84a}
 .status{color:#b9bfcb;font-size:14px}
 @media(max-width:820px){
 .top .in{padding:10px 14px;gap:10px}.sbox{min-width:0}.logo{font-size:18px}
@@ -83,6 +84,7 @@ h1{font-size:24px}
  <nav id="nav" aria-label="Categories"></nav>
  <main>
   <h1 id="h">All Sports</h1>
+  <div class="upd" id="upd"></div>
   <div class="ctl">
    <label>Odds ceiling <input id="cap" type="range" min="1.01" max="1.15" step="0.01" value="1.15"> <b id="capv">1.15</b></label>
    <span class="status" id="stat"></span>
@@ -179,7 +181,7 @@ const cache=LS.get("lo.cache");if(cache&&Array.isArray(cache.all)){S.all=cache.a
 const DAY=864e5,iso=t=>new Date(t).toISOString().replace(/\.\d+Z$/,"Z"),baseUrl=()=>(cfg.base||"https://gamma-api.polymarket.com").replace(/\/$/,"");
 async function tfetch(u){const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);try{return await fetch(u,{signal:c.signal})}finally{clearTimeout(t)}}
 async function load(){
- if(S.busy)return;S.busy=true;$("refresh").textContent="Loading";S.err="";S.err2="";S.capped=false;
+ if(S.busy)return;S.busy=true;$("refresh").textContent="Loading";S.err="";S.err2="";S.capped=false;render();
  try{
   const base=baseUrl(),now=Date.now(),days=cfg.days||7,STEP=DAY/4,chunks=[];
   for(let a=now-DAY/2;a<now+(days+1)*DAY;a+=STEP)chunks.push([a,a+STEP]);
@@ -213,7 +215,12 @@ function render(){
  const base=S.all.filter(c=>c.start>now&&!cfg.hide.includes(c.sport)).map(c=>({...c,sels:c.sels.filter(s=>s.dec<=S.cap+1e-9)})).filter(c=>c.sels.length);
  const inq=c=>!q||c.title.toLowerCase().includes(q)||c.sels.some(s=>s.name.toLowerCase().includes(q));
  $("capv").textContent=S.cap.toFixed(2);
- $("stat").textContent=S.at?"Updated "+new Date(S.at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+", "+base.length+" events":"";
+ $("stat").textContent=S.at?base.length+" events":"";
+ const u=$("upd");u.textContent="";
+ if(S.at){const mins=Math.floor((now-S.at)/6e4),ago=mins<1?"just now":mins<60?mins+" min ago":Math.floor(mins/60)+"h "+(mins%60)+"m ago";
+  u.append("Last updated ",el("b","",new Date(S.at).toLocaleString([],{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})),S.busy?" (updating now)":" ("+ago+")");
+  u.className="upd"+(mins>30?" old":"")}
+ else{u.className="upd";u.textContent=S.busy?"Loading first update...":"Not updated yet"}
  const e=$("err");e.textContent="";if(S.err)e.append(el("div","err",S.err));if(S.err2)e.append(el("div","err",S.err2));
  const cats=["All",...[...new Set(base.map(c=>c.sport))].sort()];if(!cats.includes(S.sport))S.sport="All";
  const nav=document.createDocumentFragment();
